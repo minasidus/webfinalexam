@@ -1,0 +1,21 @@
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+form {
+    border: 2px solid #333;
+    padding: 20px;
+}
+
+h1 {
+    color: rgb(12, 224, 61);
+}
+
+h3 {
+    color: rgb(13, 232, 38);
+}

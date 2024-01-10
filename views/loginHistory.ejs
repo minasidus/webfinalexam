@@ -1,0 +1,109 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/styles.css">
+    <title>Login History</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Your App Name</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/loginHistory">Login History</a>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-danger" onclick="logout()">Logout</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-5 text-center">
+        <h1>Login History</h1>
+
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Login Date</th>
+                </tr>
+            </thead>
+            <tbody id="loginHistoryTableBody">
+                
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/loginHistory.js"></script>
+
+    <script>
+        function logout() {
+            
+            $.ajax({
+                type: 'POST',
+                url: '/api/logout',
+                success: function (response) {
+                    console.log('Logout response:', response);
+                    if (response.success) {
+                        
+                        window.location.href = '/';
+                    } else {
+                        alert('Logout error');
+                    }
+                },
+                error: function (error) {
+                    console.error('Ajax request failed', error);
+                    alert('Error occurred. Please try again later.');
+                }
+            });
+        }    
+       
+        $(document).ready(function () {
+            
+            updateLoginHistoryTable();
+        });
+    
+        
+        function updateLoginHistoryTable() {
+            
+            $.ajax({
+                type: 'GET',
+                url: '/api/getloginhistory',
+                success: function (data) {
+                    
+                    const loginHistoryTableBody = $('#loginHistoryTableBody');
+                    loginHistoryTableBody.empty(); 
+    
+                    data.loginHistory.forEach(log => {
+                        const row = `<tr>
+                                        <td>${log.Username}</td>
+                                        <td>${log.LoginDate}</td>
+                                    </tr>`;
+                        loginHistoryTableBody.append(row);
+                    });
+                },
+                error: function (error) {
+                    console.error('Ajax request failed', error);
+                }
+            });
+        }
+    
+       
+    </script>
+</body>
+</html>

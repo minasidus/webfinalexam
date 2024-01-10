@@ -1,0 +1,276 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/styles.css">
+    <title>Dashboard</title>
+    <style>
+        body {
+            background: url('/home/sidus/Desktop/wexam/finalexam/public/halftone-background-with-circles') no-repeat center center fixed; 
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Your App Name</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/loginHistory">Login History</a>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-danger" onclick="logout()">Logout</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5 text-center">
+        <h1 style="color: rgb(7, 238, 72);">Dashboard</h1>
+        <img src="https://via.placeholder.com/300" alt="url('/home/sidus/Desktop/wexam/finalexam/public/halftone-background-with-circles/5172658.jpg')" class="img-fluid">
+
+        
+        <div class="mt-5" style="text-align: left;">
+            <h3 style="color: rgb(18, 232, 93);">add department</h3>
+            <form id="addDepartmentForm">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Department Name" name="departmentName" required>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="submitAddDepartmentForm()">Add Department</button>
+            </form>
+        </div>
+
+        
+        <div class="mt-5" style="text-align: left;">
+            <h3 style="color: rgb(22, 211, 63);">add user</h3>
+            <form id="addUserForm">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" placeholder="Password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Department ID" name="departmentId" required>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="submitAddUserForm()">Add User</button>
+            </form>
+        </div>
+
+       
+        <div class="row mt-5">
+            
+            <div class="col-md-6">
+                <h3 style="color: rgb(22, 211, 63);">Departments</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="color: rgb(22, 211, 63);">Department identification</th>
+                            <th style="color: rgb(22, 211, 63);">Department Name</th>
+                        </tr>
+                    </thead>
+                    <tbody id="departmentTableBody">
+                        
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h3 style="color: rgb(22, 211, 63);">Current Users</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="color: rgb(22, 211, 63);">Username</th>
+                            <th style="color: rgb(22, 211, 63);">Password</th>
+                            <th style="color: rgb(22, 211, 63);">Department</th>
+                            <th style="color: rgb(22, 211, 63);">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        
+                    </tbody>
+                </table>
+            </div>
+
+            
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/dashboard.js"></script>
+
+
+
+    <script>
+        function submitAddDepartmentForm() {
+            const departmentName = $('#addDepartmentForm input[name="departmentName"]').val();
+        
+            $.ajax({
+                type: 'POST',
+                url: '/api/adddepartment',
+                data: { departmentName: departmentName },
+                success: function (response) {
+                    console.log('Add Department response:', response);
+                    if (response.success) {
+                       
+                        updateDepartmentTable();
+                        console.log('Department added successfully');
+                    } else {
+                        alert('Error happened. Please try again later.');
+                    }
+                },
+                error: function (error) {
+                    console.error('Ajax request failed', error);
+                    alert('Error occurred. Please try again later.');
+                }
+            });
+        }        
+        function logout() {
+           
+            $.ajax({
+                type: 'POST',
+                url: '/api/logout',
+                success: function (response) {
+                    console.log('Logout response:', response);
+                    if (response.success) {
+                        
+                        window.location.href = '/';
+                    } else {
+                        alert('error in logging out');
+                    }
+                },
+                error: function (error) {
+                    console.error('Ajax failed to request', error);
+                    alert('Error !!!');
+                }
+            });
+        }
+        function updateDepartmentTable() {
+            
+            $.ajax({
+                type: 'GET',
+                url: '/api/getdepartments',
+                success: function (data) {
+                   
+                    const departmentTableBody = $('#departmentTableBody');
+                    departmentTableBody.empty();
+    
+                    data.departments.forEach(department => {
+                        const row = `<tr>
+                                        <td>${department.Id}</td>
+                                        <td>${department.Name}</td>
+                                    </tr>`;
+                        departmentTableBody.append(row);
+                    });
+                },
+                error: function (error) {
+                    console.error('Ajax request failed', error);
+                }
+            });
+        }
+        $(document).ready(function () {
+            
+            updateDepartmentTable();
+    
+           
+            updateUserTable();
+        });
+        
+        
+        function submitAddUserForm() {
+            const username = $('#addUserForm input[name="username"]').val();
+            const password = $('#addUserForm input[name="password"]').val();
+            const departmentId = $('#addUserForm input[name="departmentId"]').val();
+        
+            $.ajax({
+                type: 'POST',
+                url: '/api/adduser',
+                data: { username, password, departmentId },
+                success: function (response) {
+                    console.log('Add User response:', response);
+                    if (response.success) {
+                        
+                        updateUserTable();
+                        console.log('User added successfully');
+                    } else {
+                        alert('Error happened. Please try again later.');
+                    }
+                },
+                error: function (error) {
+                    console.error('Ajax request failed', error);
+                    alert('Error occurred. Please try again later.');
+                }
+            });
+        }
+        
+    
+        
+        function updateUserTable() {
+            
+            $.ajax({
+                type: 'GET',
+                url: '/api/getusers',
+                success: function (data) {
+                  
+                    const userTableBody = $('#userTableBody');
+                    userTableBody.empty(); 
+    
+                    data.users.forEach(user => {
+                        const row = `<tr>
+                                        <td>${user.Username}</td>
+                                        <td>${user.Password}</td>
+                                        <td>${user.DepartmentID}</td>
+                                        <td><button class="btn btn-danger" onclick="deleteUser(${user.Id})">delete</button></td>
+                                    </tr>`;
+                        userTableBody.append(row);
+                    });
+                },
+                error: function (error) {
+                    console.error('Ajax request failed', error);
+                }
+            });
+        }
+         
+    function deleteUser(userId) {
+        
+        $.ajax({
+            type: 'POST',
+            url: '/api/deleteuser',
+            data: { userId: userId },
+            success: function (response) {
+                console.log('Delete User:', response);
+                if (response.success) {
+                    
+                    updateUserTable();
+                    console.log('User deleted');
+                } else {
+                    alert('Error happened in deleting user');
+                }
+            },
+            error: function (error) {
+                console.error('Ajax request failed', error);
+                alert('Error occurred in ajax request');
+            }
+        });
+    }
+    </script>
+    
+   
+
+</body>
+</html>
